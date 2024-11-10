@@ -2,16 +2,15 @@ import pygame
 import time
 import random
 
-# Inicjalizacja pygame
 pygame.init()
 
-# Ustawienia okna
+# Frame settings
 window_width = 600
 window_height = 400
 window = pygame.display.set_mode((window_width, window_height))
 pygame.display.set_caption('Snake')
 
-# Kolory
+# Colors
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (213, 50, 80)
@@ -19,31 +18,32 @@ green = (0, 255, 0)
 first_background_color = (173, 216, 230)
 second_background_color = (240, 240, 240)
 
-# Ustawienia węża i jedzenia
+# Snake & food settings
 snake_block = 10
 snake_speed = 12
 
-# Czcionki
+# Fonts
 font_style = pygame.font.SysFont(None, 35)
 
 
-# Funkcja wyświetlania punktów
+# Score function
 def show_score(score):
     value = font_style.render("Score: " + str(score), True, black)
     window.blit(value, [0, 0])
 
 
-# Funkcja tworząca węża
+# Snake initialization
 def our_snake(snake_block, snake_list):
     for x in snake_list:
         pygame.draw.rect(window, black, [x[0], x[1], snake_block, snake_block])
 
 
-# Funkcja komunikatu na końcu gry
+# End game message
 def message(msg, color):
     mesg = font_style.render(msg, True, color)
     window.blit(mesg, [window_width / 6, window_height / 3])
 
+# Background drawing
 def draw_background():
         for y in range(0, window_height, snake_block):
             for x in range(0, window_width, snake_block):
@@ -54,7 +54,7 @@ def draw_background():
                 pygame.draw.rect(window, color, [x, y, snake_block, snake_block])
 
 
-# Główna funkcja gry
+# Main game function
 def game_loop():
     game_over = False
     game_close = False
@@ -68,11 +68,11 @@ def game_loop():
     snake_list = []
     length_of_snake = 1
 
-    # Pozycja jedzenia
+    # Food position - random coordinates
     foodx = round(random.randrange(0, window_width - snake_block) / 10.0) * 10.0
     foody = round(random.randrange(0, window_height - snake_block) / 10.0) * 10.0
 
-    # Główna pętla gry
+    # Game loop
     clock = pygame.time.Clock()
     while not game_over:
 
@@ -82,7 +82,7 @@ def game_loop():
             show_score(length_of_snake - 1)
             pygame.display.update()
 
-            # Obsługa zdarzeń po zakończeniu gry
+            # Events after game
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_q:
@@ -92,7 +92,7 @@ def game_loop():
                         game_loop()
                         return
 
-        # Obsługa zdarzeń sterowania
+        # Handling control events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_over = True
@@ -110,7 +110,7 @@ def game_loop():
                     y1_change = snake_block
                     x1_change = 0
 
-        # Aktualizacja pozycji węża
+        # Snake position update
         if x1 >= window_width or x1 < 0 or y1 >= window_height or y1 < 0:
             game_close = True
         x1 += x1_change
@@ -125,7 +125,6 @@ def game_loop():
         if len(snake_list) > length_of_snake:
             del snake_list[0]
 
-        # Sprawdzenie kolizji z samym sobą
         for x in snake_list[:-1]:
             if x == snake_head:
                 game_close = True
@@ -135,11 +134,12 @@ def game_loop():
 
         pygame.display.update()
 
-        # Sprawdzanie, czy wąż zjadł jedzenie
         if x1 == foodx and y1 == foody:
-            foodx = round(random.randrange(0, window_width - snake_block) / 10.0) * 10.0
-            foody = round(random.randrange(0, window_height - snake_block) / 10.0) * 10.0
             length_of_snake += 1
+            # Nowe jedzenie nie pojawi się na ciele węża
+            while [foodx, foody] in snake_list:
+                foodx = round(random.randrange(0, window_width - snake_block) / 10.0) * 10.0
+                foody = round(random.randrange(0, window_height - snake_block) / 10.0) * 10.0
 
         clock.tick(snake_speed)
 
@@ -147,5 +147,5 @@ def game_loop():
     quit()
 
 
-# Start gry
+# Start the game
 game_loop()
